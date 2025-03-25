@@ -1,7 +1,12 @@
 
 package com.mycompany.login.gui;
 
+import com.mycompany.login.persistencia.Conexion;
 import java.awt.Color;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 
 public class PrincipalLogin extends javax.swing.JFrame {
@@ -282,15 +287,45 @@ public class PrincipalLogin extends javax.swing.JFrame {
     }//GEN-LAST:event_campoContraseñaMousePressed
 
     private void loginBtnTxtMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_loginBtnTxtMouseExited
-        // TODO add your handling code here:
+        // no
     }//GEN-LAST:event_loginBtnTxtMouseExited
 
     private void loginBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_loginBtnMouseClicked
-        //mo
+        //no
     }//GEN-LAST:event_loginBtnMouseClicked
 
     private void loginBtnTxtMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_loginBtnTxtMouseClicked
-         javax.swing.JOptionPane.showMessageDialog(this, " El usuario ingresado es: " + campoUsuario.getText() + " La contraseña es "+ String.valueOf(campoContraseña.getPassword()), " LOGIN ", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+    String user = campoUsuario.getText();
+    String pass = String.valueOf(campoContraseña.getPassword());
+
+    Connection con = Conexion.getConnection();
+
+    try {
+        String sql = "SELECT * FROM usuario WHERE usuario = ? AND contraseña = ?";
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setString(1, user);
+        ps.setString(2, pass);
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            // Login correcto
+            javax.swing.JOptionPane.showMessageDialog(this, "Bienvenido " + user);
+
+            Dashboard dash = new Dashboard();
+            dash.setVisible(true);
+            dash.setLocationRelativeTo(null); // Centra ventana
+            this.dispose(); // Cierra login
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos.");
+        }
+
+        rs.close();
+        ps.close();
+        con.close();
+    } catch (SQLException e) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+    }
     }//GEN-LAST:event_loginBtnTxtMouseClicked
 
 
